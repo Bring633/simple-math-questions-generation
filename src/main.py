@@ -243,14 +243,45 @@ def write_result(answer_dict):
         i += 1
 
 
+def judge_answer(input_file, answer_file='Answer.txt'):
+    """
+    统计答案文件的结果
+
+    :param input_file: 用户给定的答案文件
+    :param answer_file: 正确答案文件
+    :return: None
+    """
+    # 读取两个文件
+    correct_answer = []
+    for line in open(answer_file, 'r', encoding='utf8'):
+        correct_answer.append(line)
+    input_answer = []
+    for line in open(input_file, 'r', encoding='utf8'):
+        input_answer.append(line)
+    # 对答案进行统计
+    correct_list = []
+    wrong_list = []
+    for i in range(len(correct_answer)):
+        if correct_answer[i] == input_answer[i]:
+            correct_list.append(i + 1)
+        else:
+            wrong_list.append(i + 1)
+    # 将结果写入文件
+    with open('Grade.txt', 'w', encoding='utf8') as f:
+        f.write('Correct: ' + str(len(correct_list)) + ' ' + str(tuple(correct_list)) + '\n')
+        f.write('Wrong: ' + str(len(wrong_list)) + ' ' + str(tuple(wrong_list)))
+        f.close()
+
+
 if __name__ == "__main__":
     a = generate_float_num(10)
     b = generate_operation(10)
     c = combined(a, b)
     an = generate_answer(c, 1)
-    print(an)
+    # print(an)
     write_result(an)
 
+    judge_answer(input_file='Answer.txt')
 
 # 获取命令行参数
 # import argparse

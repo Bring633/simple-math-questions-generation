@@ -217,12 +217,39 @@ def generate_answer(list_, float_):
     return answer_dict
 
 
+def write_result(answer_dict):
+    """
+    将题目和答案写入txt文件
+
+    :param answer_dict: 生成的题目字典
+    :return: None
+    """
+    # 清空文件
+    with open('Exercises.txt', 'w') as f:
+        f.truncate()
+        f.close()
+    with open('Answer.txt', 'w') as f:
+        f.truncate()
+        f.close()
+    # 写入文件
+    i = 1
+    for key, value in answer_dict.items():
+        with open('Exercises.txt', 'a', encoding='utf8') as f:
+            f.write(str(i) + '.' + key + '\n')
+            f.close()
+        with open('Answer.txt', 'a', encoding='utf8') as f:
+            f.write(str(i) + '.' + value + '\n')
+            f.close()
+        i += 1
+
+
 if __name__ == "__main__":
     a = generate_float_num(10)
     b = generate_operation(10)
     c = combined(a, b)
     an = generate_answer(c, 1)
     print(an)
+    write_result(an)
 
 
 # 获取命令行参数

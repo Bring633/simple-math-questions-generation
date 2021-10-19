@@ -69,6 +69,24 @@ def integer_num_answer_gen(list_a):
     return None
 
 
+def format_frac(frac):
+    """
+    格式化输出真分数
+
+    :param frac: 分数
+    :return: 以str类型返回格式化后的真分数(eg. 19/8 => 2'3/8)
+    """
+    numerator = frac.numerator  # 分子
+    denominator = frac.denominator  # 分母
+    if numerator > denominator:
+        temp = divmod(numerator, denominator)   # 获取商和余数
+        return str(temp[0]) + '’' + str(temp[1]) + '/' + str(denominator)
+    elif numerator == denominator:
+        return str(1)
+    else:
+        return str(frac)
+
+
 def combined(data, operation):
     """
     输入：array格式的三列数据和array格式的两列操作
@@ -180,9 +198,9 @@ def generate_answer(list_, float_):
 
         if float_:
 
-            a = Fraction(extract_list[0][0]).limit_denominator()
-            b = Fraction(extract_list[1][0]).limit_denominator()
-            c = Fraction(extract_list[2][0]).limit_denominator()
+            a = format_frac(Fraction(extract_list[0][0]).limit_denominator())
+            b = format_frac(Fraction(extract_list[1][0]).limit_denominator())
+            c = format_frac(Fraction(extract_list[2][0]).limit_denominator())
 
             equation = str(a) \
                        + str('÷' if extract_list[0][1] == '/' else extract_list[0][1]) \
@@ -190,7 +208,7 @@ def generate_answer(list_, float_):
                        + str(c)
             # equation = str(a) + extract_list[0][1] + str(b) + extract_list[1][1] + str(c)
 
-            answer_dict[equation] = str(Fraction(answer).limit_denominator())
+            answer_dict[equation] = format_frac(Fraction(answer).limit_denominator())
 
         else:
 

@@ -57,18 +57,6 @@ def generate_operation(n):
 
     return np.array([map_[i] for i in index]).reshape((n, 2))
 
-
-def float_to_frac_and_answer_gen(list_a):
-    for i in list_a:
-        pass
-
-    return None
-
-
-def integer_num_answer_gen(list_a):
-    return None
-
-
 def format_frac(frac):
     """
     格式化输出真分数
@@ -272,8 +260,55 @@ def judge_answer(input_file, answer_file='Answer.txt'):
         f.write('Wrong: ' + str(len(wrong_list)) + ' ' + str(tuple(wrong_list)))
         f.close()
 
+def main():
+    
+    mode = input('please input mode you would like to choose(1 denotes generation, 2 denotes answer check)')
+    
+    while mode not in ['2','1']:
+        print("wrong input\n")
+        mode = input('please input mode you would like to choose(1 denotes generation, 2 denotes answer check)')
+    
+    if mode == '1':
+        """
+        补充参数部分
+        """
+    
+        n=10;r=None;e=None;a=None
+    
+        n_float = n//2
+        n_integer = n-n_float
+        
+        num_float = generate_float_num(n_float)
+        num_integer = generate_integer_num(n_integer)
+    
+        float_op = generate_operation(n_float)
+        integer_op = generate_operation(n_integer)
+        
+        answer_integer = generate_answer(combined(num_integer,integer_op),0)
+        answer_float = generate_answer(combined(num_float,float_op),0)
+    
+        write_result(answer_float)
+        write_result(answer_integer)
+        
+    else:
+        """
+        补充参数部分
+        """
+        input_file = None
+        judge_answer(input_file)
+        
+    
+    print('complete')
+    
+    return None
+
+
+    
+    
+    
 
 if __name__ == "__main__":
+    """
     a = generate_float_num(10)
     b = generate_operation(10)
     c = combined(a, b)
@@ -282,7 +317,8 @@ if __name__ == "__main__":
     write_result(an)
 
     judge_answer(input_file='Answer.txt')
-
+"""
+    main()
 # 获取命令行参数
 # import argparse
 #

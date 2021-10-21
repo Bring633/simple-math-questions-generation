@@ -200,7 +200,7 @@ def generate_answer(list_, float_):
 
         else:
 
-            answer_dict[list_[i]] = answer
+            answer_dict[list_[i]] = str(answer)
 
     return answer_dict
 
@@ -285,7 +285,7 @@ def main():
         integer_op = generate_operation(n_integer)
         
         answer_integer = generate_answer(combined(num_integer,integer_op),0)
-        answer_float = generate_answer(combined(num_float,float_op),0)
+        answer_float = generate_answer(combined(num_float,float_op),1)
     
         write_result(answer_float)
         write_result(answer_integer)

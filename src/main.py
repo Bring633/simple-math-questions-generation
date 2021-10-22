@@ -103,7 +103,6 @@ def answer_(extract_):
     """
     用于生成一道题目的答案
     """
-
     flag = 0
 
     op1 = extract_[0][1]
@@ -115,8 +114,9 @@ def answer_(extract_):
             mid_ = float(extract_[0][0]) * float(extract_[1][0])
         else:
             if float(extract_[1][0]) == 0:
+                print("minus")
                 flag = 1
-                return None, flag
+                return extract_, None, flag
             mid_ = float(extract_[0][0]) / float(extract_[1][0])
 
         if op2 == 'x' or op1 == '/':
@@ -126,15 +126,21 @@ def answer_(extract_):
             else:
 
                 if float(extract_[2][0]) == 0:
+                    print("minus")
                     flag = 1
-                    return None, flag
+                    return extract_, None, flag
                 mid_ = mid_ / float(extract_[2][0])
 
         else:
             if op2 == '+':
                 mid_ = mid_ + float(extract_[2][0])
-            else:
+            else:   # op2 == '-'
                 mid_ = float(mid_) - float(extract_[2][0])
+                if mid_ < 0:
+                    mid_ = -mid_
+                    temp = extract_[1][0]
+                    extract_[1][0] = extract_[2][0]
+                    extract_[2][0] = temp
 
     elif op2 == 'x' or op2 == '/':
 
@@ -142,14 +148,20 @@ def answer_(extract_):
             mid_ = float(extract_[1][0]) * float(extract_[2][0])
         else:
             if float(extract_[2][0]) == 0:
+                print("minus")
                 flag = 1
-                return None, flag
+                return extract_, None, flag
             mid_ = float(extract_[1][0]) / float(extract_[2][0])
 
         if op1 == '+':
             mid_ = float(extract_[0][0]) + float(mid_)
-        else:
+        else:   # op1 == '-'
             mid_ = float(extract_[0][0]) - float(mid_)
+            if mid_ < 0:
+                mid_ = -mid_
+                temp = extract_[0][0]
+                extract_[0][0] = extract_[1][0]
+                extract_[1][0] = temp
 
     else:
 
@@ -157,12 +169,22 @@ def answer_(extract_):
             mid_ = float(extract_[0][0]) + float(extract_[1][0])
         else:
             mid_ = float(extract_[0][0]) - float(extract_[1][0])
+            if mid_ < 0:
+                mid_ = -mid_
+                temp = extract_[0][0]
+                extract_[0][0] = extract_[1][0]
+                extract_[1][0] = temp
         if op2 == '+':
             mid_ = mid_ + float(extract_[2][0])
         else:
             mid_ = mid_ - float(extract_[2][0])
+            if mid_ < 0:
+                mid_ = -mid_
+                temp = extract_[1][0]
+                extract_[1][0] = extract_[2][0]
+                extract_[2][0] = temp
 
-    return mid_, flag
+    return extract_, mid_, flag
 
 
 def generate_answer(list_, float_):
@@ -175,11 +197,15 @@ def generate_answer(list_, float_):
 
     len_ = len(list_)
     answer_dict = {}
-
     for i in range(len_):
 
-        extract_list = re.findall(pattern, list_[i])
-        answer, flag = answer_(extract_list[:3])
+        extract_list = list(re.findall(pattern, list_[i]))
+        # 对extract_list进行处理
+        temp = []
+        for extract in extract_list:
+            temp.append(list(extract))
+        extract_list = temp
+        extract_list, answer, flag = answer_(extract_list[:3])
 
         if flag == 1 or answer < 0:
             continue

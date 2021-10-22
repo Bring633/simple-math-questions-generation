@@ -199,8 +199,16 @@ def generate_answer(list_, float_):
             answer_dict[equation] = format_frac(Fraction(answer).limit_denominator())
 
         else:
+            
+            a = (extract_list[0][0])
+            b = (extract_list[1][0])
+            c = (extract_list[2][0])
 
-            answer_dict[list_[i]] = str(answer)
+            equation = str(a) \
+                       + str('÷' if extract_list[0][1] == '/' else extract_list[0][1]) \
+                       + str(b) + str('÷' if extract_list[1][1] == '/' else extract_list[1][1]) \
+                       + str(c)
+            answer_dict[equation] = str(answer)
 
     return answer_dict
 

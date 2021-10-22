@@ -57,6 +57,7 @@ def generate_operation(n):
 
     return np.array([map_[i] for i in index]).reshape((n, 2))
 
+
 def format_frac(frac):
     """
     格式化输出真分数
@@ -67,7 +68,7 @@ def format_frac(frac):
     numerator = frac.numerator  # 分子
     denominator = frac.denominator  # 分母
     if numerator > denominator:
-        temp = divmod(numerator, denominator)   # 获取商和余数
+        temp = divmod(numerator, denominator)  # 获取商和余数
         return str(temp[0]) + '’' + str(temp[1]) + '/' + str(denominator)
     elif numerator == denominator:
         return str(1)
@@ -192,25 +193,40 @@ def generate_answer(list_, float_):
 
             equation = str(a) \
                        + str('÷' if extract_list[0][1] == '/' else extract_list[0][1]) \
-                       + str(b) + str('÷' if extract_list[1][1] == '/' else extract_list[1][1]) \
+                       + str(b) \
+                       + str('÷' if extract_list[1][1] == '/' else extract_list[1][1]) \
                        + str(c)
-            # equation = str(a) + extract_list[0][1] + str(b) + extract_list[1][1] + str(c)
 
             answer_dict[equation] = format_frac(Fraction(answer).limit_denominator())
 
         else:
-            
+
             a = (extract_list[0][0])
             b = (extract_list[1][0])
             c = (extract_list[2][0])
 
             equation = str(a) \
                        + str('÷' if extract_list[0][1] == '/' else extract_list[0][1]) \
-                       + str(b) + str('÷' if extract_list[1][1] == '/' else extract_list[1][1]) \
+                       + str(b) \
+                       + str('÷' if extract_list[1][1] == '/' else extract_list[1][1]) \
                        + str(c)
-            answer_dict[equation] = str(answer)
+
+            answer_dict[equation] = answer_check(answer)
 
     return answer_dict
+
+
+def answer_check(answer):
+    """
+    判断数据是整数还是小数
+    :param answer:
+    :return:
+    """
+    answer_str = str(answer).split('.')  # 转为str类型，获取小数点后的数据
+    if float(answer_str[1]) == 0:  # 判断小数点后是否为0
+        return str(int(answer))
+    else:  # 若是小数则进行真分数格式化
+        return format_frac(Fraction(answer).limit_denominator())
 
 
 def write_result(answer_dict):
@@ -268,52 +284,50 @@ def judge_answer(input_file, answer_file='Answer.txt'):
         f.write('Wrong: ' + str(len(wrong_list)) + ' ' + str(tuple(wrong_list)))
         f.close()
 
+
 def main():
-    
     mode = input('please input mode you would like to choose(1 denotes generation, 2 denotes answer check)')
-    
-    while mode not in ['2','1']:
+
+    while mode not in ['2', '1']:
         print("wrong input\n")
         mode = input('please input mode you would like to choose(1 denotes generation, 2 denotes answer check)')
-    
+
     if mode == '1':
         """
         补充参数部分
         """
-    
-        n=10;r=None;e=None;a=None
-    
-        n_float = n//2
-        n_integer = n-n_float
-        
+
+        n = 10
+        r = None
+        e = None
+        a = None
+
+        n_float = n // 2
+        n_integer = n - n_float
+
         num_float = generate_float_num(n_float)
         num_integer = generate_integer_num(n_integer)
-    
+
         float_op = generate_operation(n_float)
         integer_op = generate_operation(n_integer)
-        
-        answer_integer = generate_answer(combined(num_integer,integer_op),0)
-        answer_float = generate_answer(combined(num_float,float_op),1)
-    
-        write_result(answer_float)
-        write_result(answer_integer)
-        
+
+        answer_integer = generate_answer(combined(num_integer, integer_op), 0)
+        answer_float = generate_answer(combined(num_float, float_op), 1)
+
+        res_dict = {**answer_integer, **answer_float}
+        write_result(res_dict)
+
     else:
         """
         补充参数部分
         """
-        input_file = None
+        input_file = "Answer.txt"
         judge_answer(input_file)
-        
-    
+
     print('complete')
-    
+
     return None
 
-
-    
-    
-    
 
 if __name__ == "__main__":
     """

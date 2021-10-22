@@ -9,6 +9,7 @@ Created on Wed Oct 13 22:48:32 2021
 import numpy as np
 from fractions import Fraction
 import re
+import argparse
 
 file = r'../data/'
 map_ = {0: '+', 1: '-', 2: 'x', 3: '/'}
@@ -286,47 +287,83 @@ def judge_answer(input_file, answer_file='Answer.txt'):
 
 
 def main():
-    mode = input('please input mode you would like to choose(1 denotes generation, 2 denotes answer check)')
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-n', type=int)  # 生成题目的个数
+    parser.add_argument('-r', type=int)  # 题目中数字的范围
+    parser.add_argument('-e', type=str)  # 给定题目文件
+    parser.add_argument('-a', type=str)  # 给定答案文件
+    argv_dict = parser.parse_args().__dict__  # 获取字典
+    if argv_dict['n'] is None:
+        raise ValueError("-n参数必须给出，用于控制生成题目的数量")
+    if argv_dict['r'] is None:
+        raise ValueError("-r参数必须给出，用于控制题目中数值的范围")
 
-    while mode not in ['2', '1']:
-        print("wrong input\n")
-        mode = input('please input mode you would like to choose(1 denotes generation, 2 denotes answer check)')
+    n = argv_dict['n']
+    r = argv_dict['r']
 
-    if mode == '1':
-        """
-        补充参数部分
-        """
+    n_float = n // 2
+    n_integer = n - n_float
 
-        n = 10
-        r = None
-        e = None
-        a = None
+    num_float = generate_float_num(n_float, r)
+    num_integer = generate_integer_num(n_integer, r)
 
-        n_float = n // 2
-        n_integer = n - n_float
+    float_op = generate_operation(n_float)
+    integer_op = generate_operation(n_integer)
 
-        num_float = generate_float_num(n_float)
-        num_integer = generate_integer_num(n_integer)
+    answer_integer = generate_answer(combined(num_integer, integer_op), 0)
+    answer_float = generate_answer(combined(num_float, float_op), 1)
 
-        float_op = generate_operation(n_float)
-        integer_op = generate_operation(n_integer)
+    res_dict = {**answer_integer, **answer_float}
+    write_result(res_dict)
 
-        answer_integer = generate_answer(combined(num_integer, integer_op), 0)
-        answer_float = generate_answer(combined(num_float, float_op), 1)
+    # if argv_dict['e'] is not None:
+    #     print((argv_dict['e']))
+    # if argv_dict['a'] is not None:
+    #     print((argv_dict['a']))
 
-        res_dict = {**answer_integer, **answer_float}
-        write_result(res_dict)
 
-    else:
-        """
-        补充参数部分
-        """
-        input_file = "Answer.txt"
-        judge_answer(input_file)
-
-    print('complete')
-
-    return None
+# def main():
+#     mode = input('please input mode you would like to choose(1 denotes generation, 2 denotes answer check)')
+#
+#     while mode not in ['2', '1']:
+#         print("wrong input\n")
+#         mode = input('please input mode you would like to choose(1 denotes generation, 2 denotes answer check)')
+#
+#     if mode == '1':
+#         """
+#         补充参数部分
+#         """
+#
+#         n = 10
+#         r = 20
+#         e = None
+#         a = None
+#
+#         n_float = n // 2
+#         n_integer = n - n_float
+#
+#         num_float = generate_float_num(n_float, r)
+#         num_integer = generate_integer_num(n_integer, r)
+#
+#         float_op = generate_operation(n_float)
+#         integer_op = generate_operation(n_integer)
+#
+#         answer_integer = generate_answer(combined(num_integer, integer_op), 0)
+#         answer_float = generate_answer(combined(num_float, float_op), 1)
+#
+#         res_dict = {**answer_integer, **answer_float}
+#         write_result(res_dict)
+#
+#     else:
+#         """
+#         补充参数部分
+#         """
+#         input_file = "Answer.txt"
+#         judge_answer(input_file)
+#
+#     print('complete')
+#
+#     return None
 
 
 if __name__ == "__main__":

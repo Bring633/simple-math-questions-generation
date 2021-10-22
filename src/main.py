@@ -293,28 +293,48 @@ def main():
     parser.add_argument('-e', type=str)  # 给定题目文件
     parser.add_argument('-a', type=str)  # 给定答案文件
     argv_dict = parser.parse_args().__dict__  # 获取字典
-    if argv_dict['n'] is None:
-        raise ValueError("-n参数必须给出，用于控制生成题目的数量")
-    if argv_dict['r'] is None:
-        raise ValueError("-r参数必须给出，用于控制题目中数值的范围")
+    if argv_dict['e'] is None and argv_dict['a'] is None:  # 生成题目
+        if argv_dict['n'] is None:
+            raise ValueError("-n参数必须给出，用于控制生成题目的数量")
+        if argv_dict['r'] is None:
+            raise ValueError("-r参数必须给出，用于控制题目中数值的范围")
 
-    n = argv_dict['n']
-    r = argv_dict['r']
+        n = argv_dict['n']
+        r = argv_dict['r']
 
-    n_float = n // 2
-    n_integer = n - n_float
+        n_float = n // 2
+        n_integer = n - n_float
 
-    num_float = generate_float_num(n_float, r)
-    num_integer = generate_integer_num(n_integer, r)
+        num_float = generate_float_num(n_float, r)
+        num_integer = generate_integer_num(n_integer, r)
 
-    float_op = generate_operation(n_float)
-    integer_op = generate_operation(n_integer)
+        float_op = generate_operation(n_float)
+        integer_op = generate_operation(n_integer)
 
-    answer_integer = generate_answer(combined(num_integer, integer_op), 0)
-    answer_float = generate_answer(combined(num_float, float_op), 1)
+        answer_integer = generate_answer(combined(num_integer, integer_op), 0)
+        answer_float = generate_answer(combined(num_float, float_op), 1)
 
-    res_dict = {**answer_integer, **answer_float}
-    write_result(res_dict)
+        res_dict = {**answer_integer, **answer_float}
+        write_result(res_dict)
+
+        print('Completed.')
+
+    elif argv_dict['n'] is None and argv_dict['r'] is None:  # 答案校验
+        if argv_dict['e'] is None:
+            raise ValueError("-e参数必须给出，表示题目文件")
+        if argv_dict['a'] is None:
+            raise ValueError("-a参数必须给出，表示答案文件")
+
+        e = argv_dict['e']
+        a = argv_dict['a']
+
+        if e != 'Exercises.txt':
+            raise FileNotFoundError("找不到文件：" + e)
+        judge_answer(a)
+
+        print('Completed.')
+    else:
+        raise ValueError("参数搭配错误，生成题目使用参数-n -r，答案校验使用参数-e -a")
 
     # if argv_dict['e'] is not None:
     #     print((argv_dict['e']))

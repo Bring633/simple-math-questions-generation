@@ -330,18 +330,35 @@ def main():
         n = argv_dict['n']
         r = argv_dict['r']
 
-        n_float = n // 2
-        n_integer = n - n_float
+        answer_float,answer_integer = generate_questions(n,r)
+        len_ = len(answer_integer)+len(answer_float)
+         
+        while(len_<n):
+             
+            midval_float,midval_integer = generate_questions(n,r)
+            len_midval = len(midval_float)+len(midval_integer)
+             
+            answer_float = dict(answer_float,**midval_float)
+            answer_integer = dict(answer_integer,**midval_integer)
 
-        num_float = generate_float_num(n_float, r)
-        num_integer = generate_integer_num(n_integer, r)
-
-        float_op = generate_operation(n_float)
-        integer_op = generate_operation(n_integer)
-
-        answer_integer = generate_answer(combined(num_integer, integer_op), 0)
-        answer_float = generate_answer(combined(num_float, float_op), 1)
-
+            if len_midval+len_ <= n:             
+                continue
+            else:
+                 
+                index_float = np.random.choice(range(len(answer_float)),(n//2,),False)
+                index_integer = np.random.choice(range(len(answer_integer)),(n-n//2,),False)
+                 
+                keys_float = list(answer_float.keys())
+                keys_integer = list(answer_integer.keys())
+                 
+                index_float_mask = [keys_float[i] for i in index_float]
+                index_integer_mask = [keys_integer[i] for i in index_integer]
+                 
+                answer_float = {i:answer_float[i] for i in index_float_mask}
+                answer_integer = {i:answer_integer[i] for i in index_integer_mask}
+            
+            len_ = len(answer_integer)+len(answer_float)
+            
         res_dict = {**answer_integer, **answer_float}
         write_result(res_dict)
 

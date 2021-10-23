@@ -8,8 +8,10 @@ import numpy as np
 from fractions import Fraction
 import re
 import argparse
-file = r'../data/'
+
 map_ = {0: '+', 1: '-', 2: 'x', 3: '/'}
+
+
 def generate_integer_num(n, high=None):
     """
     输入：n,控制生成题目的个数
@@ -23,6 +25,8 @@ def generate_integer_num(n, high=None):
     b_index = np.random.randint(0, group_b.shape[0], size=n)
     chosen_b = group_b[b_index, :]
     return chosen_b.astype('str')
+
+
 def generate_float_num(n, high=None):
     """
     输入：n,控制生成题目的个数
@@ -33,6 +37,8 @@ def generate_float_num(n, high=None):
     a_index = np.random.randint(0, group_a.shape[0], size=n)
     chosen_a = np.round(group_a[a_index, :], 2)
     return chosen_a.astype('str')
+
+
 def generate_operation(n):
     """
     输入：n,控制生成题目的个数
@@ -40,6 +46,8 @@ def generate_operation(n):
     """
     index = list(np.random.randint(0, 4, size=2 * n))
     return np.array([map_[i] for i in index]).reshape((n, 2))
+
+
 def format_frac(frac):
     """
     格式化输出真分数
@@ -55,6 +63,8 @@ def format_frac(frac):
         return str(1)
     else:
         return str(frac)
+
+
 def combined(data, operation):
     """
     输入：array格式的三列数据和array格式的两列操作
@@ -70,6 +80,8 @@ def combined(data, operation):
         list_data[i].insert(1, first_op)
         list_data[i].insert(3, second_op)
     return [''.join(i) for i in list_data]
+
+
 def answer_(extract_):
     """
     用于生成一道题目的答案
@@ -119,8 +131,10 @@ def answer_(extract_):
             mid_ = mid_ + float(extract_[2][0])
         else:
             mid_ = mid_ - float(extract_[2][0])
-            
+
     return mid_, flag
+
+
 def generate_answer(list_, float_):
     """
     输入：字符串形式存储的题目列表
@@ -156,6 +170,8 @@ def generate_answer(list_, float_):
                        + str(c)
             answer_dict[equation] = answer_check(answer)
     return answer_dict
+
+
 def answer_check(answer):
     """
     判断数据是整数还是小数
@@ -167,6 +183,8 @@ def answer_check(answer):
         return str(int(answer))
     else:  # 若是小数则进行真分数格式化
         return format_frac(Fraction(answer).limit_denominator())
+
+
 def write_result(answer_dict):
     """
     将题目和答案写入txt文件
@@ -190,6 +208,8 @@ def write_result(answer_dict):
             f.write(str(i) + '.' + value + '\n')
             f.close()
         i += 1
+
+
 def judge_answer(input_file, answer_file='Answer.txt'):
     """
     统计答案文件的结果
@@ -219,7 +239,6 @@ def judge_answer(input_file, answer_file='Answer.txt'):
         f.close()
 
 
-"""
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-n', type=int)  # 生成题目的个数
@@ -232,48 +251,56 @@ def main():
             raise ValueError("-n参数必须给出，用于控制生成题目的数量")
         if argv_dict['r'] is None:
             raise ValueError("-r参数必须给出，用于控制题目中数值的范围")
-
         n = argv_dict['n']
         r = argv_dict['r']
 
-        n_float = n // 2
-        n_integer = n - n_float
-        num_float = generate_float_num(n_float, r)
-        num_integer = generate_integer_num(n_integer, r)
+        answer_float, answer_integer = generate_questions(n, r)
+        len_ = len(answer_integer) + len(answer_float)
 
-        float_op = generate_operation(n_float)
-        integer_op = generate_operation(n_integer)
+        while len_ < n:
 
-        answer_integer = generate_answer(combined(num_integer, integer_op), 0)
-        answer_float = generate_answer(combined(num_float, float_op), 1)
+            midval_float, midval_integer = generate_questions(n, r)
+            len_midval = len(midval_float) + len(midval_integer)
 
+            answer_float = dict(answer_float, **midval_float)
+            answer_integer = dict(answer_integer, **midval_integer)
+
+            if len_midval + len_ <= n:
+                continue
+            else:
+
+                index_float = np.random.choice(range(len(answer_float)), (n // 2,), False)
+                index_integer = np.random.choice(range(len(answer_integer)), (n - n // 2,), False)
+
+                keys_float = list(answer_float.keys())
+                keys_integer = list(answer_integer.keys())
+
+                index_float_mask = [keys_float[i] for i in index_float]
+                index_integer_mask = [keys_integer[i] for i in index_integer]
+
+                answer_float = {i: answer_float[i] for i in index_float_mask}
+                answer_integer = {i: answer_integer[i] for i in index_integer_mask}
+
+            len_ = len(answer_integer) + len(answer_float)
         res_dict = {**answer_integer, **answer_float}
         write_result(res_dict)
-
         print('Completed.')
-
     elif argv_dict['n'] is None and argv_dict['r'] is None:  # 答案校验
         if argv_dict['e'] is None:
             raise ValueError("-e参数必须给出，表示题目文件")
         if argv_dict['a'] is None:
             raise ValueError("-a参数必须给出，表示答案文件")
-
         e = argv_dict['e']
         a = argv_dict['a']
-
         if e != 'Exercises.txt':
             raise FileNotFoundError("找不到文件：" + e)
         judge_answer(a)
-
         print('Completed.')
     else:
         raise ValueError("参数搭配错误，生成题目使用参数-n -r，答案校验使用参数-e -a")
-"""
-    
-          
-  
 
-def generate_questions(n,r):
+
+def generate_questions(n, r):
     n_float = n // 2
     n_integer = n - n_float
 
@@ -285,79 +312,70 @@ def generate_questions(n,r):
 
     answer_integer = generate_answer(combined(num_integer, integer_op), 0)
     answer_float = generate_answer(combined(num_float, float_op), 1)
-         
-    return answer_float,answer_integer
-        
-    
 
-def main():
-     mode = input('please input mode you would like to choose(1 denotes generation, 2 denotes answer check)')
+    return answer_float, answer_integer
 
-     while mode not in ['2', '1']:
-         print("wrong input\n")
-         mode = input('please input mode you would like to choose(1 denotes generation, 2 denotes answer check)')
 
-     if mode == '1':
-         """
-         补充参数部分
-         """
+# 测试用
+# def main():
+#     mode = str(1)
+#     # mode = input('please input mode you would like to choose(1 denotes generation, 2 denotes answer check)')
+#
+#     while mode not in ['2', '1']:
+#         print("wrong input\n")
+#         mode = input('please input mode you would like to choose(1 denotes generation, 2 denotes answer check)')
+#
+#     if mode == '1':
+#         """
+#         补充参数部分
+#         """
+#
+#         n = 100
+#         r = 20
+#
+#         answer_float, answer_integer = generate_questions(n, r)
+#         len_ = len(answer_integer) + len(answer_float)
+#
+#         while (len_ < n):
+#
+#             midval_float, midval_integer = generate_questions(n, r)
+#             len_midval = len(midval_float) + len(midval_integer)
+#
+#             answer_float = dict(answer_float, **midval_float)
+#             answer_integer = dict(answer_integer, **midval_integer)
+#
+#             if len_midval + len_ <= n:
+#                 continue
+#             else:
+#
+#                 index_float = np.random.choice(range(len(answer_float)), (n // 2,), False)
+#                 index_integer = np.random.choice(range(len(answer_integer)), (n - n // 2,), False)
+#
+#                 keys_float = list(answer_float.keys())
+#                 keys_integer = list(answer_integer.keys())
+#
+#                 index_float_mask = [keys_float[i] for i in index_float]
+#                 index_integer_mask = [keys_integer[i] for i in index_integer]
+#
+#                 answer_float = {i: answer_float[i] for i in index_float_mask}
+#                 answer_integer = {i: answer_integer[i] for i in index_integer_mask}
+#
+#             len_ = len(answer_integer) + len(answer_float)
+#
+#         res_dict = {**answer_integer, **answer_float}
+#         write_result(res_dict)
+#
+#     else:
+#         """
+#         补充参数部分
+#         """
+#         input_file = "Answer.txt"
+#         judge_answer(input_file)
+#
+#     print('complete')
+#
+#     return None
 
-         n = 100
-         r = 20
-         e = None
-         a = None
-
-         answer_float,answer_integer = generate_questions(n,r)
-         len_ = len(answer_integer)+len(answer_float)
-         
-         while(len_<n):
-             
-             midval_float,midval_integer = generate_questions(n,r)
-             len_midval = len(midval_float)+len(midval_integer)
-             
-             answer_float = dict(answer_float,**midval_float)
-             answer_integer = dict(answer_integer,**midval_integer)
-
-             if len_midval+len_ <= n:             
-                 continue
-             else:
-                 
-                 index_float = np.random.choice(range(len(answer_float)),(n//2,),False)
-                 index_integer = np.random.choice(range(len(answer_integer)),(n-n//2,),False)
-                 
-                 keys_float = list(answer_float.keys())
-                 keys_integer = list(answer_integer.keys())
-                 
-                 index_float_mask = [keys_float[i] for i in index_float]
-                 index_integer_mask = [keys_integer[i] for i in index_integer]
-                 
-                 answer_float = {i:answer_float[i] for i in index_float_mask}
-                 answer_integer = {i:answer_integer[i] for i in index_integer_mask}
-            
-             len_ = len(answer_integer)+len(answer_float)
-            
-         res_dict = {**answer_integer, **answer_float}
-         write_result(res_dict)
-
-     else:
-         """
-         补充参数部分
-         """
-         input_file = "Answer.txt"
-         judge_answer(input_file)
-
-     print('complete')
-
-     return None
 
 if __name__ == "__main__":
-    """
-    a = generate_float_num(10)
-    b = generate_operation(10)
-    c = combined(a, b)
-    an = generate_answer(c, 1)
-    # print(an)
-    write_result(an)
-    judge_answer(input_file='Answer.txt')
-"""
     main()

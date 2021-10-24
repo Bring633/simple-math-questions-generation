@@ -9,8 +9,28 @@ import os
 import main
 
 
+def change_answer():
+    # 读取答案文件存储到列表
+    an_list = []
+    for line in open('Answer.txt', 'r', encoding='utf-8-sig'):
+        an_list.append(line)
+    # 改变数据的位置
+    pos_list = random.sample(range(1000), 40)
+    for pos in pos_list:
+        an_list[pos] = an_list[pos] + '0'
+    # 转为str类型
+    an_str = ""
+    for an in an_list:
+        an_str += an
+    # 写入新文件
+    with open('change_answer.txt', 'w', encoding='utf-8-sig') as f:
+        f.write(an_str)
+        f.close()
+
+
 class Test(unittest.TestCase):
 
+    # os调用执行程序
     # 测试生成10000道题目
     def test1(self):
         os.system('python main.py -n 10000 -r 100')
@@ -33,24 +53,16 @@ class Test(unittest.TestCase):
 
     # 测试答案校验
     def test7(self):
-        # 读取答案文件存储到列表
-        an_list = []
-        for line in open('Answer.txt', 'r', encoding='utf-8-sig'):
-            an_list.append(line)
-        # 改变数据的位置
-        pos_list = random.sample(range(1000), 40)
-        for pos in pos_list:
-            an_list[pos] = an_list[pos] + '0'
-        # 转为str类型
-        an_str = ""
-        for an in an_list:
-            an_str += an
-        # 写入新文件
-        with open('change_answer.txt', 'w', encoding='utf-8-sig') as f:
-            f.write(an_str)
-            f.close()
-        # 答案校验
+        change_answer()
         os.system('python main.py -e Exercises.txt -a change_answer.txt')
+
+    # 调用程序
+    def test8(self):
+        main.main_test(1, n=10000, r=100)
+
+    def test9(self):
+        change_answer()
+        main.main_test(2, e="Exercises.txt", a="change_answer.txt")
 
 
 if __name__ == '__main__':

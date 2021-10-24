@@ -317,64 +317,63 @@ def generate_questions(n, r):
 
 
 # 测试用
-# def main():
-#     mode = str(1)
-#     # mode = input('please input mode you would like to choose(1 denotes generation, 2 denotes answer check)')
-#
-#     while mode not in ['2', '1']:
-#         print("wrong input\n")
-#         mode = input('please input mode you would like to choose(1 denotes generation, 2 denotes answer check)')
-#
-#     if mode == '1':
-#         """
-#         补充参数部分
-#         """
-#
-#         n = 100
-#         r = 20
-#
-#         answer_float, answer_integer = generate_questions(n, r)
-#         len_ = len(answer_integer) + len(answer_float)
-#
-#         while (len_ < n):
-#
-#             midval_float, midval_integer = generate_questions(n, r)
-#             len_midval = len(midval_float) + len(midval_integer)
-#
-#             answer_float = dict(answer_float, **midval_float)
-#             answer_integer = dict(answer_integer, **midval_integer)
-#
-#             if len_midval + len_ <= n:
-#                 continue
-#             else:
-#
-#                 index_float = np.random.choice(range(len(answer_float)), (n // 2,), False)
-#                 index_integer = np.random.choice(range(len(answer_integer)), (n - n // 2,), False)
-#
-#                 keys_float = list(answer_float.keys())
-#                 keys_integer = list(answer_integer.keys())
-#
-#                 index_float_mask = [keys_float[i] for i in index_float]
-#                 index_integer_mask = [keys_integer[i] for i in index_integer]
-#
-#                 answer_float = {i: answer_float[i] for i in index_float_mask}
-#                 answer_integer = {i: answer_integer[i] for i in index_integer_mask}
-#
-#             len_ = len(answer_integer) + len(answer_float)
-#
-#         res_dict = {**answer_integer, **answer_float}
-#         write_result(res_dict)
-#
-#     else:
-#         """
-#         补充参数部分
-#         """
-#         input_file = "Answer.txt"
-#         judge_answer(input_file)
-#
-#     print('complete')
-#
-#     return None
+def main_test(mode, n=None, r=None, e=None, a=None):
+    mode = str(mode)
+    # mode = input('please input mode you would like to choose(1 denotes generation, 2 denotes answer check)')
+
+    while mode not in ['2', '1']:
+        print("wrong input\n")
+        # mode = input('please input mode you would like to choose(1 denotes generation, 2 denotes answer check)')
+        raise ValueError('mode : 1 or 2')
+
+    if mode == '1':
+        """
+        补充参数部分
+        """
+
+        answer_float, answer_integer = generate_questions(n, r)
+        len_ = len(answer_integer) + len(answer_float)
+
+        while len_ < n:
+
+            midval_float, midval_integer = generate_questions(n, r)
+            len_midval = len(midval_float) + len(midval_integer)
+
+            answer_float = dict(answer_float, **midval_float)
+            answer_integer = dict(answer_integer, **midval_integer)
+
+            if len_midval + len_ <= n:
+                continue
+            else:
+
+                index_float = np.random.choice(range(len(answer_float)), (n // 2,), False)
+                index_integer = np.random.choice(range(len(answer_integer)), (n - n // 2,), False)
+
+                keys_float = list(answer_float.keys())
+                keys_integer = list(answer_integer.keys())
+
+                index_float_mask = [keys_float[i] for i in index_float]
+                index_integer_mask = [keys_integer[i] for i in index_integer]
+
+                answer_float = {i: answer_float[i] for i in index_float_mask}
+                answer_integer = {i: answer_integer[i] for i in index_integer_mask}
+
+            len_ = len(answer_integer) + len(answer_float)
+
+        res_dict = {**answer_integer, **answer_float}
+        write_result(res_dict)
+
+    else:
+        """
+        补充参数部分
+        """
+        if e != 'Exercises.txt':
+            raise FileNotFoundError("找不到文件：" + e)
+        judge_answer(a)
+
+    print('complete')
+
+    # return None
 
 
 if __name__ == "__main__":
